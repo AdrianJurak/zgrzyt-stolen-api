@@ -1,0 +1,1131 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "ZGRZYT API",
+        "description": "Dokumentacja API dla systemu Zgłoszeń i Rejestru Zdarzeń Technicznych (ZGRZYT). Jest to webowa aplikacja do zgłaszania, obsługi i monitorowania błędów w systemach informatycznych.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autoryzacja"
+                ],
+                "summary": "Logowanie użytkownika",
+                "description": "Uwierzytelnia użytkownika na podstawie loginu i hasła, a w odpowiedzi zwraca token dostępowy (Bearer Token) oraz rolę użytkownika. Ten endpoint jest publiczny i nie wymaga autoryzacji.",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "description": "Dane logowania użytkownika.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "jkowalski"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logowanie pomyślne. Zwraca token i rolę.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "1|aBcDeFgHiJkLmNoPqRsTuVwXyZ..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd uwierzytelniania (nieprawidłowe dane logowania)."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji (np. brakujące pola)."
+                    }
+                },
+                "security": []
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autoryzacja"
+                ],
+                "summary": "Tworzenie nowego użytkownika przez Admina/IT",
+                "description": "Tworzy nowe konto użytkownika. Dostępne tylko dla uwierzytelnionych użytkowników z rolą 'admin' lub 'it'. Pozwala na zdefiniowanie roli nowego użytkownika.",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "login",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jan Kowalski"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "jkowalski"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "j.kowalski@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user",
+                                        "enum": [
+                                            "user",
+                                            "it",
+                                            "admin"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Użytkownik utworzony pomyślnie.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji danych."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/request-account": {
+            "post": {
+                "tags": [
+                    "Autoryzacja"
+                ],
+                "summary": "Zażądaj utworzenia nowego konta użytkownika",
+                "description": "Umożliwia zalogowanemu użytkownikowi wysłanie prośby o utworzenie nowego konta (np. dla nowego pracownika). Tworzy **nieaktywne** konto i automatycznie generuje zgłoszenie do działu IT z prośbą o jego aktywację.",
+                "operationId": "2d6096a0adbcdcf576717ed3d1f85b6a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "login",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Anna Nowak"
+                                    },
+                                    "login": {
+                                        "type": "string",
+                                        "example": "anowak"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "a.nowak@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Prośba o konto została pomyślnie wysłana.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji danych (np. email już istnieje)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Autoryzacja"
+                ],
+                "summary": "Wylogowanie użytkownika (unieważnienie tokena API)",
+                "description": "Unieważnia token dostępowy API (Bearer token), z którym zostało wykonane żądanie. Jest to metoda wylogowania dla klientów API (np. aplikacji frontendowej Vue).",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Token pomyślnie unieważniony.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji (brak lub nieprawidłowy token)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tickets/{ticket}/messages": {
+            "post": {
+                "tags": [
+                    "Wiadomości"
+                ],
+                "summary": "Dodaje nową wiadomość do zgłoszenia",
+                "description": "Umożliwia zalogowanemu użytkownikowi dodanie nowej wiadomości (komentarza) do istniejącego zgłoszenia. Użytkownik musi mieć uprawnienia do interakcji ze zgłoszeniem.",
+                "operationId": "68d601f01b8a354302c0fda10d5a6c27",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "ID zgłoszenia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Treść nowej wiadomości.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "body"
+                                ],
+                                "properties": {
+                                    "body": {
+                                        "type": "string",
+                                        "example": "Próbowałem zrestartować komputer, ale to nie pomogło."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Wiadomość pomyślnie dodana.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageFull"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do dodawania wiadomości w tym zgłoszeniu."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono zgłoszenia."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji (np. pusta treść)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Sesja"
+                ],
+                "summary": "Wylogowanie użytkownika (sesja webowa)",
+                "description": "Kończy sesję użytkownika w aplikacji webowej (unieważnia sesję).",
+                "operationId": "47fe20490afc15b35cdb187abd89d83b",
+                "responses": {
+                    "200": {
+                        "description": "Pomyślnie wylogowano"
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji (użytkownik niezalogowany)"
+                    }
+                }
+            }
+        },
+        "/reset-session": {
+            "post": {
+                "tags": [
+                    "Sesja"
+                ],
+                "summary": "Resetowanie sesji",
+                "description": "Wymusza wyczyszczenie całej sesji i tokenów po stronie serwera.",
+                "operationId": "679fb8cdc013f16541de7cdff8b091b5",
+                "responses": {
+                    "200": {
+                        "description": "Sesja wyczyszczona"
+                    }
+                }
+            }
+        },
+        "/auth-status": {
+            "get": {
+                "tags": [
+                    "Sesja"
+                ],
+                "summary": "Sprawdzenie statusu autoryzacji",
+                "description": "Zwraca informację, czy użytkownik jest aktualnie zalogowany, wraz z jego podstawowymi danymi.",
+                "operationId": "c53df93dc842bea4ec7b35fe22505eb9",
+                "responses": {
+                    "200": {
+                        "description": "Zwraca status autoryzacji i dane użytkownika",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "authenticated": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tickets": {
+            "get": {
+                "tags": [
+                    "Zgłoszenia"
+                ],
+                "summary": "Wyświetla listę zgłoszeń",
+                "description": "Zwraca listę zgłoszeń. Użytkownicy z rolą 'user' widzą tylko swoje zgłoszenia. Użytkownicy 'it' i 'admin' widzą wszystkie.",
+                "operationId": "0082053c3590628e674a11ec0d1466e6",
+                "responses": {
+                    "200": {
+                        "description": "Lista zgłoszeń.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TicketFull"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Zgłoszenia"
+                ],
+                "summary": "Zapisuje nowe zgłoszenie",
+                "description": "Tworzy nowe zgłoszenie w imieniu zalogowanego użytkownika.",
+                "operationId": "93882881cca9046d8c6ddbbab7309b4b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Drukarka nie działa",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Drukarka w pokoju 101 nie drukuje, świeci się czerwona lampka."
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "example": "niski",
+                                        "enum": [
+                                            "niski",
+                                            "średni",
+                                            "wysoki"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Zgłoszenie pomyślnie utworzone.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ticket"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji."
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tickets/{ticket}": {
+            "get": {
+                "tags": [
+                    "Zgłoszenia"
+                ],
+                "summary": "Wyświetla określone zgłoszenie",
+                "description": "Pobiera szczegółowe informacje o pojedynczym zgłoszeniu, w tym dane zgłaszającego, przypisanego pracownika IT oraz historię wiadomości.",
+                "operationId": "653dfec809dc77c94527ffba9c1a6a42",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "ID zgłoszenia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Szczegóły zgłoszenia.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TicketFull"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do wyświetlenia tego zgłoszenia."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono zgłoszenia."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Zgłoszenia"
+                ],
+                "summary": "Aktualizuje określone zgłoszenie",
+                "description": "Aktualizuje status, priorytet lub przypisanie pracownika IT do zgłoszenia. Dostępne tylko dla ról 'it' i 'admin'.",
+                "operationId": "32c4911fd210af747ca91977ce7bde92",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "ID zgłoszenia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Pola do zaktualizowania.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "nowe",
+                                            "w trakcie",
+                                            "zamknięte"
+                                        ]
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "niski",
+                                            "średni",
+                                            "wysoki"
+                                        ]
+                                    },
+                                    "assigned_it_id": {
+                                        "description": "ID użytkownika (z rolą IT/Admin) do przypisania.",
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Zgłoszenie pomyślnie zaktualizowane.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ticket"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do aktualizacji tego zgłoszenia."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono zgłoszenia."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Zgłoszenia"
+                ],
+                "summary": "Usuwa określone zgłoszenie",
+                "description": "Trwale usuwa zgłoszenie z systemu. Dostępne w zależności od zdefiniowanej polityki autoryzacji (prawdopodobnie dla admina).",
+                "operationId": "bb7be4d54b9a05e0df84e30a5c97f18a",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "ID zgłoszenia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Zgłoszenie pomyślnie usunięte."
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji."
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do usunięcia tego zgłoszenia."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono zgłoszenia."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Pobierz dane zalogowanego użytkownika",
+                "description": "Zwraca dane użytkownika powiązanego z użytym tokenem API. Służy do weryfikacji tokena i pobrania podstawowych informacji (np. rola, nazwa). Jeśli token jest nieprawidłowy lub wygasł, serwer zwróci błąd 401 Unauthenticated.",
+                "operationId": "443a86b946289ac1c7d778796173bbc9",
+                "responses": {
+                    "200": {
+                        "description": "Dane zalogowanego użytkownika.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Błąd autoryzacji (brak lub nieprawidłowy token)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}/activate": {
+            "post": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Aktywacja konta użytkownika",
+                "description": "Aktywuje nieaktywne konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
+                "operationId": "08a4bfa6d72774e9aea0e4c200589975",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID użytkownika do aktywacji",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Konto pomyślnie aktywowane.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Konto użytkownika zostało pomyślnie aktywowane."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak uprawnień."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono użytkownika."
+                    },
+                    "409": {
+                        "description": "Użytkownik jest już aktywny (Conflict)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}/ban": {
+            "post": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Banowanie konta użytkownika",
+                "description": "Banuje konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
+                "operationId": "295e2117b489f0d5da8d359809f43536",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID użytkownika do zbanowania",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Konto pomyślnie zbanowane.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Konto użytkownika zostało pomyślnie zbanowane."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak uprawnień."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono użytkownika."
+                    },
+                    "409": {
+                        "description": "Użytkownik jest już zbanowany (Conflict)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}/unban": {
+            "post": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Odblokowanie (unban) konta użytkownika",
+                "description": "Odblokowuje zbanowane konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'. Wymaga potwierdzenia hasłem osoby wykonującej akcję.",
+                "operationId": "edc4ce1d97ff98787dfe250a3d6f36b1",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID użytkownika do odbanowania",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Hasło użytkownika wykonującego operację w celu potwierdzenia.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "password"
+                                ],
+                                "properties": {
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Konto pomyślnie odbanowane.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Konto użytkownika zostało pomyślnie odbanowane."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak uprawnień lub nieprawidłowe hasło."
+                    },
+                    "404": {
+                        "description": "Nie znaleziono użytkownika."
+                    },
+                    "409": {
+                        "description": "Użytkownik nie jest zbanowany (Conflict)."
+                    },
+                    "422": {
+                        "description": "Błąd walidacji (np. brak hasła)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "title": "User",
+                "description": "Model użytkownika",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Jan Kowalski"
+                    },
+                    "login": {
+                        "type": "string",
+                        "example": "jkowalski"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "j.kowalski@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "user",
+                        "enum": [
+                            "user",
+                            "it",
+                            "admin"
+                        ]
+                    },
+                    "active": {
+                        "description": "Status aktywności konta.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "Ticket": {
+                "title": "Ticket",
+                "description": "Model zgłoszenia",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Błąd logowania"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Nie mogę się zalogować do systemu X."
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "nowe",
+                        "enum": [
+                            "nowe",
+                            "w trakcie",
+                            "zamknięte"
+                        ]
+                    },
+                    "priority": {
+                        "type": "string",
+                        "example": "średni",
+                        "enum": [
+                            "niski",
+                            "średni",
+                            "wysoki"
+                        ]
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "assigned_it_id": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "Message": {
+                "title": "Message",
+                "description": "Model wiadomości w zgłoszeniu",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "body": {
+                        "type": "string",
+                        "example": "Proszę o więcej szczegółów."
+                    },
+                    "ticket_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "sender_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object"
+            },
+            "TicketFull": {
+                "title": "TicketFull",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Ticket"
+                    },
+                    {
+                        "properties": {
+                            "user": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "assignedTo": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                ],
+                                "nullable": true
+                            },
+                            "messages": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/MessageFull"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "MessageFull": {
+                "title": "MessageFull",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Message"
+                    },
+                    {
+                        "properties": {
+                            "sender": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autoryzacja",
+            "description": "Endpointy do rejestracji i wylogowywania z API tokenowego."
+        },
+        {
+            "name": "Sesja",
+            "description": "Operacje związane z sesją (logowanie, status, wylogowanie) dla panelu webowego i API."
+        },
+        {
+            "name": "Zgłoszenia",
+            "description": "Zarządzanie zgłoszeniami (tickets)."
+        },
+        {
+            "name": "Wiadomości",
+            "description": "Komunikacja w ramach zgłoszeń."
+        },
+        {
+            "name": "Użytkownicy",
+            "description": "Użytkownicy"
+        }
+    ]
+}
