@@ -13,7 +13,7 @@
                 ],
                 "summary": "Logowanie użytkownika",
                 "description": "Uwierzytelnia użytkownika na podstawie loginu i hasła, a w odpowiedzi zwraca token dostępowy (Bearer Token) oraz rolę użytkownika. Ten endpoint jest publiczny i nie wymaga autoryzacji.",
-                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "operationId": "loginUser",
                 "requestBody": {
                     "description": "Dane logowania użytkownika.",
                     "required": true,
@@ -82,7 +82,7 @@
                 ],
                 "summary": "Tworzenie nowego użytkownika przez Admina/IT",
                 "description": "Tworzy nowe konto użytkownika. Dostępne tylko dla uwierzytelnionych użytkowników z rolą 'admin' lub 'it'. Pozwala na zdefiniowanie roli nowego użytkownika.",
-                "operationId": "8a56853624e025573120a09a4c75d468",
+                "operationId": "registerUser",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -178,7 +178,7 @@
                 ],
                 "summary": "Zażądaj utworzenia nowego konta użytkownika",
                 "description": "Umożliwia zalogowanemu użytkownikowi wysłanie prośby o utworzenie nowego konta (np. dla nowego pracownika). Tworzy **nieaktywne** konto i automatycznie generuje zgłoszenie do działu IT z prośbą o jego aktywację.",
-                "operationId": "2d6096a0adbcdcf576717ed3d1f85b6a",
+                "operationId": "requestAccount",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -264,7 +264,7 @@
                 ],
                 "summary": "Wylogowanie użytkownika (unieważnienie tokena API)",
                 "description": "Unieważnia token dostępowy API (Bearer token), z którym zostało wykonane żądanie. Jest to metoda wylogowania dla klientów API (np. aplikacji frontendowej Vue).",
-                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "operationId": "logoutUser",
                 "responses": {
                     "200": {
                         "description": "Token pomyślnie unieważniony.",
@@ -299,7 +299,7 @@
                 ],
                 "summary": "Dodaje nową wiadomość do zgłoszenia",
                 "description": "Umożliwia zalogowanemu użytkownikowi dodanie nowej wiadomości (komentarza) do istniejącego zgłoszenia. Użytkownik musi mieć uprawnienia do interakcji ze zgłoszeniem.",
-                "operationId": "68d601f01b8a354302c0fda10d5a6c27",
+                "operationId": "createMessage",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -369,7 +369,7 @@
                 ],
                 "summary": "Wylogowanie użytkownika (sesja webowa)",
                 "description": "Kończy sesję użytkownika w aplikacji webowej (unieważnia sesję).",
-                "operationId": "47fe20490afc15b35cdb187abd89d83b",
+                "operationId": "logoutSession",
                 "responses": {
                     "200": {
                         "description": "Pomyślnie wylogowano"
@@ -387,7 +387,7 @@
                 ],
                 "summary": "Resetowanie sesji",
                 "description": "Wymusza wyczyszczenie całej sesji i tokenów po stronie serwera.",
-                "operationId": "679fb8cdc013f16541de7cdff8b091b5",
+                "operationId": "resetSession",
                 "responses": {
                     "200": {
                         "description": "Sesja wyczyszczona"
@@ -402,7 +402,7 @@
                 ],
                 "summary": "Sprawdzenie statusu autoryzacji",
                 "description": "Zwraca informację, czy użytkownik jest aktualnie zalogowany, wraz z jego podstawowymi danymi.",
-                "operationId": "c53df93dc842bea4ec7b35fe22505eb9",
+                "operationId": "checkAuthStatus",
                 "responses": {
                     "200": {
                         "description": "Zwraca status autoryzacji i dane użytkownika",
@@ -429,7 +429,7 @@
                 ],
                 "summary": "Wyświetla listę zgłoszeń",
                 "description": "Zwraca listę zgłoszeń. Użytkownicy z rolą 'user' widzą tylko swoje zgłoszenia. Użytkownicy 'it' i 'admin' widzą wszystkie.",
-                "operationId": "0082053c3590628e674a11ec0d1466e6",
+                "operationId": "listTickets",
                 "responses": {
                     "200": {
                         "description": "Lista zgłoszeń.",
@@ -460,7 +460,7 @@
                 ],
                 "summary": "Zapisuje nowe zgłoszenie",
                 "description": "Tworzy nowe zgłoszenie w imieniu zalogowanego użytkownika.",
-                "operationId": "93882881cca9046d8c6ddbbab7309b4b",
+                "operationId": "createTicket",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -527,7 +527,7 @@
                 ],
                 "summary": "Wyświetla określone zgłoszenie",
                 "description": "Pobiera szczegółowe informacje o pojedynczym zgłoszeniu, w tym dane zgłaszającego, przypisanego pracownika IT oraz historię wiadomości.",
-                "operationId": "653dfec809dc77c94527ffba9c1a6a42",
+                "operationId": "showTicket",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -572,7 +572,7 @@
                 ],
                 "summary": "Aktualizuje określone zgłoszenie",
                 "description": "Aktualizuje status, priorytet lub przypisanie pracownika IT do zgłoszenia. Dostępne tylko dla ról 'it' i 'admin'.",
-                "operationId": "32c4911fd210af747ca91977ce7bde92",
+                "operationId": "updateTicket",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -653,7 +653,7 @@
                 ],
                 "summary": "Usuwa określone zgłoszenie",
                 "description": "Trwale usuwa zgłoszenie z systemu. Dostępne w zależności od zdefiniowanej polityki autoryzacji (prawdopodobnie dla admina).",
-                "operationId": "bb7be4d54b9a05e0df84e30a5c97f18a",
+                "operationId": "deleteTicket",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -693,7 +693,7 @@
                 ],
                 "summary": "Pobierz dane zalogowanego użytkownika",
                 "description": "Zwraca dane użytkownika powiązanego z użytym tokenem API. Służy do weryfikacji tokena i pobrania podstawowych informacji (np. rola, nazwa). Jeśli token jest nieprawidłowy lub wygasł, serwer zwróci błąd 401 Unauthenticated.",
-                "operationId": "443a86b946289ac1c7d778796173bbc9",
+                "operationId": "getAuthenticatedUser",
                 "responses": {
                     "200": {
                         "description": "Dane zalogowanego użytkownika.",
@@ -723,7 +723,7 @@
                 ],
                 "summary": "Aktywacja konta użytkownika",
                 "description": "Aktywuje nieaktywne konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
-                "operationId": "08a4bfa6d72774e9aea0e4c200589975",
+                "operationId": "activateUser",
                 "parameters": [
                     {
                         "name": "user",
@@ -779,7 +779,7 @@
                 ],
                 "summary": "Banowanie konta użytkownika",
                 "description": "Banuje konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
-                "operationId": "295e2117b489f0d5da8d359809f43536",
+                "operationId": "banUser",
                 "parameters": [
                     {
                         "name": "user",
@@ -835,7 +835,7 @@
                 ],
                 "summary": "Odblokowanie (unban) konta użytkownika",
                 "description": "Odblokowuje zbanowane konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'. Wymaga potwierdzenia hasłem osoby wykonującej akcję.",
-                "operationId": "edc4ce1d97ff98787dfe250a3d6f36b1",
+                "operationId": "unbanUser",
                 "parameters": [
                     {
                         "name": "user",

@@ -13,6 +13,7 @@ class SessionController extends Controller
      */
     #[OA\Post(
         path: "/logout",
+        operationId: "logoutSession",
         summary: "Wylogowanie użytkownika (sesja webowa)",
         description: "Kończy sesję użytkownika w aplikacji webowej (unieważnia sesję).",
         tags: ["Sesja"],
@@ -43,6 +44,7 @@ class SessionController extends Controller
      */
     #[OA\Post(
         path: "/reset-session",
+        operationId: "resetSession",
         summary: "Resetowanie sesji",
         description: "Wymusza wyczyszczenie całej sesji i tokenów po stronie serwera.",
         tags: ["Sesja"],
@@ -66,6 +68,7 @@ class SessionController extends Controller
      */
     #[OA\Get(
         path: "/auth-status",
+        operationId: "checkAuthStatus",
         summary: "Sprawdzenie statusu autoryzacji",
         description: "Zwraca informację, czy użytkownik jest aktualnie zalogowany, wraz z jego podstawowymi danymi.",
         tags: ["Sesja"],

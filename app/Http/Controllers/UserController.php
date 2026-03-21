@@ -15,6 +15,7 @@ class UserController extends Controller
      */
     #[OA\Get(
         path: "/api/user",
+        operationId: "getAuthenticatedUser",
         summary: "Pobierz dane zalogowanego użytkownika",
         description: "Zwraca dane użytkownika powiązanego z użytym tokenem API. Służy do weryfikacji tokena i pobrania podstawowych informacji (np. rola, nazwa). Jeśli token jest nieprawidłowy lub wygasł, serwer zwróci błąd 401 Unauthenticated.",
         tags: ["Użytkownicy"],
@@ -122,6 +123,7 @@ class UserController extends Controller
      */
     #[OA\Post(
         path: "/api/users/{user}/activate",
+        operationId: "activateUser",
         summary: "Aktywacja konta użytkownika",
         description: "Aktywuje nieaktywne konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
         tags: ["Użytkownicy"],
@@ -183,6 +185,7 @@ class UserController extends Controller
      */
     #[OA\Post(
         path: "/api/users/{user}/ban",
+        operationId: "banUser",
         summary: "Banowanie konta użytkownika",
         description: "Banuje konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'.",
         tags: ["Użytkownicy"],
@@ -243,6 +246,7 @@ class UserController extends Controller
      */
     #[OA\Post(
         path: "/api/users/{user}/unban",
+        operationId: "unbanUser",
         summary: "Odblokowanie (unban) konta użytkownika",
         description: "Odblokowuje zbanowane konto użytkownika. Dostępne tylko dla ról 'admin' lub 'it'. Wymaga potwierdzenia hasłem osoby wykonującej akcję.",
         tags: ["Użytkownicy"],

@@ -19,6 +19,7 @@ class AuthController extends Controller
      */
     #[OA\Post(
         path: "/api/login",
+        operationId: "loginUser",
         summary: "Logowanie użytkownika",
         description: "Uwierzytelnia użytkownika na podstawie loginu i hasła, a w odpowiedzi zwraca token dostępowy (Bearer Token) oraz rolę użytkownika. Ten endpoint jest publiczny i nie wymaga autoryzacji.",
         tags: ["Autoryzacja"],
@@ -99,6 +100,7 @@ class AuthController extends Controller
      */
     #[OA\Post(
         path: "/api/register",
+        operationId: "registerUser",
         summary: "Tworzenie nowego użytkownika przez Admina/IT",
         description: "Tworzy nowe konto użytkownika. Dostępne tylko dla uwierzytelnionych użytkowników z rolą 'admin' lub 'it'. Pozwala na zdefiniowanie roli nowego użytkownika.",
         tags: ["Autoryzacja"],
@@ -172,6 +174,7 @@ class AuthController extends Controller
      */
     #[OA\Post(
         path: "/api/request-account",
+        operationId: "requestAccount",
         summary: "Zażądaj utworzenia nowego konta użytkownika",
         description: "Umożliwia zalogowanemu użytkownikowi wysłanie prośby o utworzenie nowego konta (np. dla nowego pracownika). Tworzy **nieaktywne** konto i automatycznie generuje zgłoszenie do działu IT z prośbą o jego aktywację.",
         tags: ["Autoryzacja"],
@@ -245,6 +248,7 @@ class AuthController extends Controller
      */
     #[OA\Post(
         path: "/api/logout",
+        operationId: "logoutUser",
         summary: "Wylogowanie użytkownika (unieważnienie tokena API)",
         description: "Unieważnia token dostępowy API (Bearer token), z którym zostało wykonane żądanie. Jest to metoda wylogowania dla klientów API (np. aplikacji frontendowej Vue).",
         tags: ["Autoryzacja"],

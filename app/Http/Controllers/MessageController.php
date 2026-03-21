@@ -18,6 +18,7 @@ class MessageController extends Controller
      */
     #[OA\Post(
         path: "/api/tickets/{ticket}/messages",
+        operationId: "createMessage",
         summary: "Dodaje nową wiadomość do zgłoszenia",
         description: "Umożliwia zalogowanemu użytkownikowi dodanie nowej wiadomości (komentarza) do istniejącego zgłoszenia. Użytkownik musi mieć uprawnienia do interakcji ze zgłoszeniem.",
         tags: ["Wiadomości"],

@@ -14,6 +14,7 @@ class TicketController extends Controller
      */
     #[OA\Get(
         path: "/api/tickets",
+        operationId: "listTickets",
         summary: "Wyświetla listę zgłoszeń",
         description: "Zwraca listę zgłoszeń. Użytkownicy z rolą 'user' widzą tylko swoje zgłoszenia. Użytkownicy 'it' i 'admin' widzą wszystkie.",
         tags: ["Zgłoszenia"],
@@ -52,6 +53,7 @@ class TicketController extends Controller
      */
     #[OA\Post(
         path: "/api/tickets",
+        operationId: "createTicket",
         summary: "Zapisuje nowe zgłoszenie",
         description: "Tworzy nowe zgłoszenie w imieniu zalogowanego użytkownika.",
         tags: ["Zgłoszenia"],
@@ -103,6 +105,7 @@ class TicketController extends Controller
      */
     #[OA\Get(
         path: "/api/tickets/{ticket}",
+        operationId: "showTicket",
         summary: "Wyświetla określone zgłoszenie",
         description: "Pobiera szczegółowe informacje o pojedynczym zgłoszeniu, w tym dane zgłaszającego, przypisanego pracownika IT oraz historię wiadomości.",
         tags: ["Zgłoszenia"],
@@ -142,6 +145,7 @@ class TicketController extends Controller
      */
     #[OA\Put(
         path: "/api/tickets/{ticket}",
+        operationId: "updateTicket",
         summary: "Aktualizuje określone zgłoszenie",
         description: "Aktualizuje status, priorytet lub przypisanie pracownika IT do zgłoszenia. Dostępne tylko dla ról 'it' i 'admin'.",
         tags: ["Zgłoszenia"],
@@ -194,6 +198,7 @@ class TicketController extends Controller
      */
     #[OA\Delete(
         path: "/api/tickets/{ticket}",
+        operationId: "deleteTicket",
         summary: "Usuwa określone zgłoszenie",
         description: "Trwale usuwa zgłoszenie z systemu. Dostępne w zależności od zdefiniowanej polityki autoryzacji (prawdopodobnie dla admina).",
         tags: ["Zgłoszenia"],
