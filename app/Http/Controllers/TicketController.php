@@ -37,13 +37,32 @@ class TicketController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role === 'user') {
-            // Rola 'User' widzi tylko własne zgłoszenia
-            $tickets = $user->tickets()->with('assignedTo')->latest()->get();
-        } else {
-            // Role 'IT' i 'Admin' widzą wszystkie zgłoszenia
-            $tickets = Ticket::with('user', 'assignedTo')->latest()->get();
+        $query = $user->role === 'user'
+            ? $user->tickets()->with('assignedTo')
+            : Ticket::with('user', 'assignedTo');
+
+        // Wyszukiwanie
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
+
+        // Sortowanie
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $allowedSorts = ['created_at', 'status', 'priority', 'title'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            $query->latest(); // domyślnie latest
+        }
+
+        // Paginacja
+        $perPage = $request->get('per_page', 15);
+        $tickets = $query->paginate($perPage);
 
         return response()->json($tickets);
     }

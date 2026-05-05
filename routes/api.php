@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 
 // --- Trasy publiczne ---
 Route::post('/login', [AuthController::class, 'login']);
-// Rejestracja jest teraz dostępna tylko dla uwierzytelnionych użytkowników (admin/it)
-// Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/request-account', [AuthController::class, 'requestAccount']);
 
 // --- Trasy chronione (wymagają uwierzytelnienia przez Sanctum) ---
 Route::middleware('auth:sanctum')->group(function () {

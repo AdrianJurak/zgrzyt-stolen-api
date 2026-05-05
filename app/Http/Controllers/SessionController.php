@@ -59,7 +59,8 @@ class SessionController extends Controller
 
         return response()->json([
             'message' => 'Sesja wyczyszczona',
-            'status' => 'success'
+            'status' => 'success',
+            'token' => csrf_token()
         ]);
     }
 
