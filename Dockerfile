@@ -21,10 +21,14 @@ WORKDIR /app
 
 COPY . .
 
+RUN touch database/database.sqlite
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN npm install && npm run build
 
+RUN php artisan l5-swagger:generate
+
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
