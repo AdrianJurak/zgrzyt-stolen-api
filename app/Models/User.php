@@ -71,9 +71,6 @@ class User extends Authenticatable implements FilamentUser
         return !is_null($this->banned_at);
     }
 
-    /**
-     * Zgłoszenia utworzone przez użytkownika.
-     */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

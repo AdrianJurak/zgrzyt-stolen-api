@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewMessageSent;
 use App\Models\Ticket;
 use OpenApi\Attributes as OA;
 use Illuminate\Http\Request;
@@ -60,6 +61,9 @@ class MessageController extends Controller
             'message' => $validatedData['body'],
             'sender_id' => $user->id,
         ]);
+
+        // Rozgłoś zdarzenie do WebSocketów
+        broadcast(new NewMessageSent($message->load('sender')))->toOthers();
 
         // Automatyczna zmiana statusu zgłoszenia po dodaniu wiadomości.
         $statusChanged = false;
