@@ -244,6 +244,45 @@ class AuthController extends Controller
     }
 
     /**
+     * Odświeża token dostępowy.
+     */
+    #[OA\Post(
+        path: "/api/refresh",
+        operationId: "refreshToken",
+        summary: "Odświeżanie tokena API",
+        description: "Unieważnia obecny token (z którego wykonano żądanie) i zwraca nowy. Służy do przedłużania sesji klienta.",
+        tags: ["Autoryzacja"],
+        security: [
+            ["bearerAuth" => []]
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Token pomyślnie odświeżony.",
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(property: "access_token", type: "string", example: "2|aBcDeFgHiJkLmNoPqRsTuVwXyZ..."),
+                    new OA\Property(property: "token_type", type: "string", example: "Bearer"),
+                    new OA\Property(property: "role", type: "string", example: "user")
+                ])
+            ),
+            new OA\Response(response: 401, description: "Błąd autoryzacji (brak lub wygasły token).")
+        ]
+    )]
+    public function refresh(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $user->currentAccessToken()->delete();
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'role' => $user->role,
+        ]);
+    }
+
+    /**
      * Niszczy uwierzytelnioną sesję (unieważnia token).
      */
     #[OA\Post(
