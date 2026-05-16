@@ -44,9 +44,10 @@ class TicketController extends Controller
         // Wyszukiwanie
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+            $searchTerm = '%' . mb_strtolower($search, 'UTF-8') . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(title) LIKE ?', [$searchTerm])
+                  ->orWhereRaw('LOWER(description) LIKE ?', [$searchTerm]);
             });
         }
 

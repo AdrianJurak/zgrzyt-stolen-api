@@ -74,7 +74,7 @@ class UserController extends Controller
         $user = User::create(array_merge(
             $validated,
             ['password' => Hash::make($validated['password'])],
-            ['active' => false]
+            ['active' => true]
         ));
 
         \App\Models\Log::create([
