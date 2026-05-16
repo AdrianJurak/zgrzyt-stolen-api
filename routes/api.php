@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/request-account', [AuthController::class, 'requestAccount']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+
 
 
     // --- Trasy dla zgłoszeń (Tickets) ---
@@ -44,9 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
     });
 
+    // --- Lista użytkowników (dostępna dla każdego, filtrowanie wyników pod rolę następuje w kontrolerze) ---
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+
     // --- Trasy zarządzania użytkownikami (IT/Admin) ---
     Route::middleware('can:access-admin-features')->group(function () {
-        Route::apiResource('users', UserController::class);
+        Route::apiResource('users', UserController::class)->except(['index']);
         Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
         Route::post('users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
         Route::post('users/{user}/unban', [UserController::class, 'unban'])->name('users.unban');

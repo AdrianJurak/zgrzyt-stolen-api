@@ -34,7 +34,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum');
-        $this->authorizeResource(User::class, 'user', ['except' => ['activate', 'ban', 'getAuthenticatedUser']]);
+        $this->authorizeResource(User::class, 'user', ['except' => ['index', 'activate', 'ban', 'getAuthenticatedUser']]);
     }
 
     public function getAuthenticatedUser(Request $request): JsonResponse
@@ -45,6 +45,25 @@ class UserController extends Controller
     /**
      * Lista użytkowników. Dla roli user pokazuje tylko swoje konto, dla it/admin wszystkie.
      */
+    #[OA\Get(
+        path: "/api/users",
+        operationId: "getUsers",
+        summary: "Wyświetla listę użytkowników",
+        description: "Pobiera tabelę użytkowników. Zwykły użytkownik (rola 'user') zobaczy tylko swoje własne konto. Pracownicy z rolą 'it' oraz 'admin' zobaczą listę wszystkich użytkowników w systemie.",
+        tags: ["Użytkownicy"],
+        security: [
+            ["bearerAuth" => []]
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Lista użytkowników pomyślnie pobrana.",
+                content: new OA\JsonContent(type: "array", items: new OA\Items(ref: "#/components/schemas/User"))
+            ),
+            new OA\Response(response: 401, description: "Błąd autoryzacji."),
+            new OA\Response(response: 403, description: "Brak uprawnień.")
+        ]
+    )]
     public function index(Request $request): JsonResponse
     {
         $authUser = $request->user();

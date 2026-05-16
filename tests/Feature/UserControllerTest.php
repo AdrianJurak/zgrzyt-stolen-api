@@ -23,16 +23,20 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Test: Zwykły użytkownik ('user') nie ma dostępu do endpointów zarządzania użytkownikami.
+     * Test: Zwykły użytkownik ('user') widzi tylko swoje własne konto w liście użytkowników.
      */
-    public function test_regular_user_is_forbidden_from_accessing_user_management(): void
+    public function test_regular_user_can_get_only_own_user_record(): void
     {
         $user = User::factory()->create(['role' => 'user']);
+        User::factory()->count(3)->create(['role' => 'user']); // inne konta, by upewnić się, że ich nie widać
 
         Sanctum::actingAs($user);
 
         $response = $this->getJson('/api/users');
-        $response->assertForbidden();
+        
+        $response->assertOk();
+        $response->assertJsonCount(1);
+        $response->assertJsonPath('0.id', $user->id);
     }
 
     /**
