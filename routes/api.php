@@ -21,8 +21,6 @@ use Illuminate\Support\Facades\Route;
 
 // --- Trasy publiczne ---
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/request-account', [AuthController::class, 'requestAccount']);
 
 // --- Trasy chronione (wymagają uwierzytelnienia przez Sanctum) ---
 Route::middleware('auth:sanctum')->group(function () {
