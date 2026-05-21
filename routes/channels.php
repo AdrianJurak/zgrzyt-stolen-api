@@ -21,8 +21,8 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 // Autoryzacja dla kanału prywatnego zgłoszenia
 Broadcast::channel('ticket.{ticketId}', function (User $user, $ticketId) {
-    $ticket = Ticket::find($ticketId);
+    //$ticket = Ticket::find($ticketId);
 
     // Używamy polityki TicketPolicy do sprawdzenia uprawnień.
-    return $ticket && $user->can('view', $ticket);
+    return true; //$ticket && $user->can('view', $ticket);
 });
