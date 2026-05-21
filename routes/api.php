@@ -8,6 +8,7 @@ use App\Http\Controllers\LogController as AdminLogController;
 use App\Http\Controllers\ListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,3 +64,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('active-users', [ListController::class, 'activeUsers'])->name('lists.active-users');
     });
 });
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
