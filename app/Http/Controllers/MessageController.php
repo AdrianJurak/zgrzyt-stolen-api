@@ -11,6 +11,31 @@ use Illuminate\Support\Facades\Auth;
 class MessageController extends Controller
 {
     /**
+     * Pobiera wiadomości dla danego zgłoszenia.
+     */
+    #[OA\Get(
+        path: "/api/tickets/{ticket}/messages",
+        operationId: "getMessages",
+        summary: "Pobiera wiadomości zgłoszenia",
+        description: "Zwraca listę wiadomości przypisanych do konkretnego zgłoszenia.",
+        tags: ["Wiadomości"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(name: "ticket", in: "path", required: true, description: "ID zgłoszenia", schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Lista wiadomości.", content: new OA\JsonContent(type: "array", items: new OA\Items(ref: "#/components/schemas/MessageFull"))),
+            new OA\Response(response: 403, description: "Brak uprawnień.")
+        ]
+    )]
+    public function index(Ticket $ticket)
+    {
+        $this->authorize('view', $ticket);
+
+        return response()->json($ticket->messages()->with('sender')->latest()->get());
+    }
+
+    /**
      * Zapisuje nową wiadomość do zgłoszenia.
      *
      * @param  \Illuminate\Http\Request  $request

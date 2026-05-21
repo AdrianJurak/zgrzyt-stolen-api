@@ -27,9 +27,7 @@ Route::post('/request-account', [AuthController::class, 'requestAccount']);
 // --- Trasy chronione (wymagają uwierzytelnienia przez Sanctum) ---
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/user', [UserController::class, 'getAuthenticatedUser'])->name('user.profile');
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
