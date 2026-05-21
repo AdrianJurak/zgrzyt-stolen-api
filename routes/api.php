@@ -5,6 +5,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogController as AdminLogController;
+use App\Http\Controllers\ListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -53,5 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
         Route::post('users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
         Route::post('users/{user}/unban', [UserController::class, 'unban'])->name('users.unban');
+    });
+
+    // ---Trasy list (paginacja danych i filtorwanie po stronie servera)
+    Route::middleware('can:access-it-features')->group(function () {
+        Route::get('active-tickets', [ListController::class, 'activeTickets'])->name('lists.active-tickets');
+        Route::get('unassigned-tickets', [ListController::class, 'unassignedTickets'])->name('lists.unassigned-tickets');
+        Route::get('banned-users', [ListController::class, 'bannedUsers'])->name('lists.banned-users');
+        Route::get('inactive-users', [ListController::class, 'inactiveUsers'])->name('lists.inactive-users');
+        Route::get('active-users', [ListController::class, 'activeUsers'])->name('lists.active-users');
     });
 });
