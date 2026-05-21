@@ -18,7 +18,7 @@ RUN docker-php-ext-install \
     mbstring \
     exif \
     pcntl \
-    intl \
+    intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
