@@ -15,6 +15,9 @@ RUN docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
     zip \
+    mbstring \
+    exif \
+    pcntl \
     intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
