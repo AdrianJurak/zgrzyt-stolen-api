@@ -22,9 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Http\Middleware\HandleCors::class,
-        ]);
-
-        $middleware->trustHosts(at: ['zgrzyt-9voev8far-adrianj-s-projects.vercel.app', 'zgrzyt-stolen-api.onrender.com']);
+        ]);;
 
         $middleware->validateCsrfTokens(except: [
             '/logout',
