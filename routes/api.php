@@ -20,7 +20,14 @@ use Illuminate\Support\Facades\Broadcast;
 | do grupy middleware "api".
 |
 */
-
+Route::get('/debug-session', function () {
+    return response()->json([
+        'session_id' => session()->getId(),
+        'user' => auth()->user(),
+        'cookies' => request()->cookies->all(),
+        'headers' => request()->headers->all()
+    ]);
+});
 // --- Trasy publiczne ---
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/request-account', [AuthController::class, 'requestAccount']);
