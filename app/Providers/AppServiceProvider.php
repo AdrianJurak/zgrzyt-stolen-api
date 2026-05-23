@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
 
     if (request()->is('admin*') || request()->is('filament*')) {
         config([
+            'session.cookie' => 'filament_session',
             'session.domain' => null,
             'session.same_site' => 'lax',
         ]);
