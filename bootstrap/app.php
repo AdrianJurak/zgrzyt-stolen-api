@@ -18,12 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->statefulApi();
 
-        $middleware->api(prepend: [
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Http\Middleware\HandleCors::class,
-        ]);;
-
         $middleware->validateCsrfTokens(except: [
             '/logout',
             '/reset-session',
